@@ -4,7 +4,7 @@ import json
 
 # ─── PAGE CONFIG ───────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="Agente Ayurveda · Loto de los Andes",
+    page_title="Agente Ayurveda",
     page_icon="🌿",
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -690,7 +690,7 @@ st.markdown("""
 <div class="hero">
   <div class="hero-logo">🌿</div>
   <h1>Agente Ayurveda</h1>
-  <p>Diagnóstico de dosha · Plan alimenticio personalizado · Loto de los Andes</p>
+  <p>Diagnóstico de dosha · Plan alimenticio personalizado</p>
 </div>
 """, unsafe_allow_html=True)
 

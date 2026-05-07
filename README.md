@@ -1,5 +1,4 @@
 # Agente Ayurveda 🌿
-## Loto de los Andes
 
 ### Instalación y ejecución
 
