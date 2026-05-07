@@ -1,5 +1,5 @@
 # Agente Ayurveda 🌿
-## Loto de los Andes · Dra. Paula Diez Carreño
+## Loto de los Andes
 
 ### Instalación y ejecución
 
@@ -44,7 +44,7 @@ Plan alimenticio personalizado:
 
 ### Estructura del agente
 
-- **Diagnóstico Prakriti**: 57 afirmaciones extraídas del Test Prakriti (Dra. Paula Diez)
+- **Diagnóstico Prakriti**: 57 afirmaciones extraídas del Test Prakriti
 - **Diagnóstico Vikriti**: 27 preguntas sobre síntomas de los últimos 3 meses
 - **Recetas integradas**: Libros de cocina Ayurvédica (Vata, Pitta, Kapha)
 - **Nutrición**: Cálculo Harris-Benedict con ajuste por dosha y actividad física
