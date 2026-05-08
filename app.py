@@ -664,6 +664,24 @@ def generar_plan_dieta(nombre, prakriti, vikriti, macros, actividad, recetas_inf
     4. Reminder: repetir el Test Vikriti en 3 meses"""
     return llamar_claude(prompt, system)
 
+
+def descripcion_prakriti_local(dosha):
+    textos = {
+        "Vata": "Tu constitución Vata es ligera, creativa y sensible. En Ayurveda, Vata se asocia con movimiento, creatividad y cambio. Mantener regularidad en las comidas, descanso y calor es clave para equilibrarlo.",
+        "Pitta": "Tu constitución Pitta es intensa, decidida y metabólica. Pitta se asocia con fuego digestivo y claridad mental. Para mantener el equilibrio, favorece alimentos frescos, dulces y evita el exceso de picante y calor.",
+        "Kapha": "Tu constitución Kapha es estable, fuerte y con buena resistencia. Kapha se relaciona con tierra y agua, dando estabilidad y calma. Para equilibrarlo, prioriza movimiento, ligereza y sabores cálidos y secos."
+    }
+    return textos.get(dosha, "Tu constitución ayurvédica se ha calculado correctamente.")
+
+
+def descripcion_vikriti_local(dosha):
+    textos = {
+        "Vata": "Actualmente tu desequilibrio se acerca a Vata, lo que puede manifestarse como sequedad, inquietud y fatiga mental. Es importante nutrir con calor, rutinas estables y alimentos húmedos y nutritivos.",
+        "Pitta": "Actualmente tu desequilibrio se acerca a Pitta, lo que puede manifestarse como irritabilidad, acidez o inflamación. Apunta a enfriar, calmar y balancear con alimentos dulces, amargos y refrescantes.",
+        "Kapha": "Actualmente tu desequilibrio se acerca a Kapha, lo que puede manifestarse como pesadez, letargo o congestión. Busca movimiento, comidas ligeras y especias que estimulen la digestión para recuperar el balance."
+    }
+    return textos.get(dosha, "Tu desequilibrio actual se ha calculado correctamente.")
+
 # ─── SESSION STATE ─────────────────────────────────────────────────────────────
 
 defaults = {
@@ -711,19 +729,16 @@ if st.session_state.step == "inicio":
             actividad = st.selectbox("Nivel de actividad física", [
                 "Sedentario", "Actividad ligera", "Actividad moderada", "Actividad intensa"
             ])
-        api_key = st.text_input("API Key de Anthropic (Claude)", type="password",
-                                help="Obtén tu key en console.anthropic.com")
         enviado = st.form_submit_button("Comenzar diagnóstico Ayurveda 🌿")
 
     if enviado:
-        if not nombre or not api_key:
-            st.error("Por favor completa tu nombre y la API Key para continuar.")
+        if not nombre:
+            st.error("Por favor completa tu nombre para continuar.")
         else:
             st.session_state.paciente = {
                 "nombre": nombre, "edad": int(edad), "sexo": sexo,
                 "peso": peso, "talla": talla, "actividad": actividad
             }
-            st.session_state.api_key = api_key
             st.session_state.step = "prakriti"
             st.rerun()
 
@@ -733,7 +748,7 @@ if st.session_state.step == "inicio":
         1. Registro de datos personales<br>
         2. Test Prakriti — tu constitución de nacimiento (se realiza una sola vez)<br>
         3. Test Vikriti — tu desequilibrio actual (se recomienda cada 3 meses)<br>
-        4. Plan alimenticio personalizado con recetas Ayurvédicas
+        4. Luego ingresarás tu API Key para obtener las recomendaciones del agente Ayurveda
     </div>
     """, unsafe_allow_html=True)
 
@@ -813,9 +828,7 @@ elif st.session_state.step == "resultado_prakriti":
     """, unsafe_allow_html=True)
 
     if not st.session_state.prakriti_resultado:
-        with st.spinner("El agente Ayurveda está analizando tu constitución..."):
-            resultado = generar_diagnostico_prakriti(scores, nombre)
-            st.session_state.prakriti_resultado = resultado
+        st.session_state.prakriti_resultado = descripcion_prakriti_local(dosha_max)
 
     st.markdown(f"""
     <div class="diet-section">
@@ -910,9 +923,7 @@ elif st.session_state.step == "resultado_vikriti":
     """, unsafe_allow_html=True)
 
     if not st.session_state.vikriti_resultado:
-        with st.spinner("Analizando tu desequilibrio actual..."):
-            resultado = generar_diagnostico_vikriti(scores_v, nombre, prakriti)
-            st.session_state.vikriti_resultado = resultado
+        st.session_state.vikriti_resultado = descripcion_vikriti_local(dosha_deseq)
 
     st.markdown(f"""
     <div class="diet-section">
@@ -928,9 +939,25 @@ elif st.session_state.step == "resultado_vikriti":
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("Generar mi plan alimenticio personalizado 🌿"):
-        st.session_state.step = "dieta"
-        st.rerun()
+    if not st.session_state.api_key:
+        st.markdown("""
+        <div class="info-box">
+            Para generar tus recomendaciones personalizadas necesitas ingresar tu API Key de Anthropic Claude.
+        </div>
+        """, unsafe_allow_html=True)
+        api_key_input = st.text_input("API Key de Anthropic (Claude)", type="password",
+                                      help="Obtén tu key en console.anthropic.com")
+        if st.button("Guardar API Key y generar plan"):
+            if api_key_input:
+                st.session_state.api_key = api_key_input
+                st.session_state.step = "dieta"
+                st.rerun()
+            else:
+                st.error("Por favor ingresa tu API Key para continuar.")
+    else:
+        if st.button("Generar mi plan alimenticio personalizado 🌿"):
+            st.session_state.step = "dieta"
+            st.rerun()
 
 # ─── STEP: DIETA ───────────────────────────────────────────────────────────────
 
